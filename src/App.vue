@@ -1,56 +1,117 @@
 
 <template>
 
-  <div class="bth_input">
-    <button class="getPostsBtn" @click="fetchPosts">get posts</button>
-    <button class="getPostsBtn" @click="addPost">add posts</button>
-    <input v-bind:value="title" @input="title = $event.target.value" type="text">
-  </div>
+  <div class="calculator">
 
-  <div class="posts">
-    <ul v-for="post in posts">
-      <li class="post">
+    <div class="show">
+      <p>{{exp}}</p>
+    </div>
 
-        {{ post.id }} | {{ post.title }}
-        <div class="buttons">
-          <button @click="() => deletePost(post.id)">delete</button>
-          <button>mark</button>
-        </div>
+    <div class="all-buttons">
+      <div class="buttons">
+        <button @click="clearExp">ON</button>
+        <button>√</button>
+        <button>%</button>
+        <button @click="calculate">←</button>
+      </div>
+      <div class="buttons">
+        <button @click="(e) => addNumber(e.target.value)" value="7">7</button>
+        <button @click="(e) => addNumber(e.target.value)" value="8">8</button>
+        <button @click="(e) => addNumber(e.target.value)" value="9">9</button>
+        <button @click="(e) => addNumber(e.target.value)" value="/">/</button>
+      </div>
+      <div class="buttons">
+        <button @click="(e) => addNumber(e.target.value)" value="4">4</button>
+        <button @click="(e) => addNumber(e.target.value)" value="5">5</button>
+        <button @click="(e) => addNumber(e.target.value)" value="6">6</button>
+        <button @click="(e) => addNumber(e.target.value)" value="*">×</button>
+      </div>
+      <div class="buttons">
+        <button @click="(e) => addNumber(e.target.value)" value="1">1</button>
+        <button @click="(e) => addNumber(e.target.value)" value="2">2</button>
+        <button @click="(e) => addNumber(e.target.value)" value="3">3</button>
+        <button @click="(e) => addNumber(e.target.value)" value="-">-</button>
+      </div>
+      <div class="buttons">
+        <button @click="(e) => addNumber(e.target.value)" value="0">0</button>
+        <button @click="(e) => addNumber(e.target.value)" value=".">.</button>
+        <button>=</button>
+        <button @click="(e) => addNumber(e.target.value)" value="+">+</button>
+      </div>
+    </div>
 
-      </li>
-    </ul>
   </div>
 
 </template>
 
 <script>
+
+  import {counter} from "@/counter";
+
   export default {
+
     data(){
       return {
-        posts: [],
-        title: ""
+        signs: "+-*/",
+        exp: ""
       }
     },
+
     methods: {
-      fetchPosts(){
-        if (this.posts.length){
-          return this.posts
+
+      calculate(){
+
+        for (let i = 0; i < this.exp.length; i++){
+
+          const char = this.exp[i]
+
+          for (let j = 0; j < this.signs.length; j++){
+
+            const sign = this.signs[j]
+
+            if (char === sign){
+
+              const num = parseInt(this.exp.slice(0, i))
+              const num2 = parseInt(this.exp.slice(i + 1, this.exp.length))
+              let result
+
+              switch (sign){
+                case "+":
+                  result = counter.sum(num, num2)
+                  this.exp = result
+                  console.log(result)
+
+                  break
+                case "-":
+                  result = counter.diff(num, num2)
+                  this.exp = result
+                  console.log(result)
+
+                  break
+                case "*":
+                  result = counter.multiply(num, num2)
+                  this.exp = result
+                  console.log(result)
+
+                  break
+                case "/":
+                  result = counter.div(num, num2)
+                  this.exp = result
+                  console.log(result)
+
+                  break
+              }
+
+            }
+          }
         }
-        fetch("https://jsonplaceholder.typicode.com/posts")
-            .then(res => res.json())
-            .then(post => this.posts = post)
       },
-      deletePost(id){
-        this.posts = this.posts.filter(post => post.id !== id)
+
+      addNumber(number){
+        this.exp = this.exp + number
       },
-      addPost(){
-        this.fetchPosts()
-        const newPost = {
-          id: this.posts.length + 1,
-          title: this.title
-        }
-        this.posts.push(newPost)
-        return posts
+      clearExp(){
+        this.exp = ""
       }
     }
   }
@@ -58,34 +119,62 @@
 
 <style>
 
-  .getPostsBtn{
-    padding: 0.6rem 0.7rem 0.6rem 0.7rem;
-    margin-right: 0.5rem;
-    border: none;
-    background-color: rgba(215, 187, 245, 0.75);
+  @import url('https://fonts.googleapis.com/css2?family=Roboto&display=swap');
+
+  p{
+    font-family: 'Roboto', sans-serif;
+    font-size: 25px;
+  }
+
+  .calculator{
+    margin-top: 5%;
+    margin-left: 34%;
+    border-radius: 10px;
+    padding: 1.5rem;
+    width: 23%;
+      background-color: rgba(181, 178, 253, 0.75);
   }
 
   button{
-    padding: 0.5rem 0.5rem 0.5rem 0.5rem;
-    margin-left: 0.5rem;
+    font-family: 'Roboto', sans-serif;
+    font-size: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    border-radius: 10px;
+    width: 4rem;
+    height: 4rem;
+    padding: 1.5rem;
+    background-color: rgba(174, 172, 250, 0.98);
     border: none;
-    background-color: rgb(255, 219, 219);
+  }
+
+  .buttons{
+    height: 5rem;
+    display: flex;
+    justify-content: space-between;
   }
 
   input{
-    width: 15rem;
-    height: 1.2rem;
-    outline: none;
     border: none;
-    padding: 0.5rem 0.5rem 0.5rem 0.5rem;
-    background-color: rgba(203, 218, 248, 0.75);
+    padding: 1rem;
+    margin: 0 1rem 1rem 1rem;
   }
 
-  .post{
-    display: flex;
-    width: fit-content;
-    justify-content: center;
+  .all-buttons{
+    display: block;
     align-items: center;
+  }
+
+  .show{
+    padding: 0 1rem 0 0;
+    height: 3rem;
+    margin-bottom: 1.5rem;
+    background-color: lightcyan;
+    display: flex;
+    align-items: center;
+    justify-content: end;
   }
 
 </style>
